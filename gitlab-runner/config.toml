@@ -5,18 +5,18 @@ check_interval = 0
   session_timeout = 1800
 
 [[runners]]
-  name = "Enzi CI"
+  name = "Deploy CI"
   url = "https://gitlab.com/"
-  token = "5mnUyTBFW19NrLkzhQwo"
+  token = ""
   executor = "shell"
   [runners.cache]
     [runners.cache.s3]
     [runners.cache.gcs]
 
 [[runners]]
-  name = "Enzi CI"
+  name = "Build CI"
   url = "https://gitlab.com/"
-  token = "8qm-MyJDa81nf3AcEyu8"
+  token = ""
   executor = "docker"
   [runners.docker]
     tls_verify = false
