@@ -1,0 +1,16 @@
+version: '3'
+services:
+  supotore_apk:
+    image: nginx:alpine
+    container_name: supotore_apk
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "8080:80"
+    volumes:
+      - /var/www/html/supotore_android_dl/:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    networks:
+      - supotore
+networks:
+  supotore
