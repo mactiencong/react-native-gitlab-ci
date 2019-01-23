@@ -1,0 +1,71 @@
+stages:
+  - test
+  - buildDebug
+  - buildRelease
+  - deploy
+  
+variables:
+  ANDROID_COMPILE_SDK: "28"
+  ANDROID_BUILD_TOOLS: "28.0.2"
+  ANDROID_SDK_TOOLS: "4333796"
+  ANDROID_APK_DOWNLOAD_PATH: "/var/www/html/supotore_android_dl"
+  
+checkEslint:
+  image: matico/react-native-eslint:1.1
+  stage: test
+  tags:
+  - test
+  allow_failure: true
+  script:
+  - npm install
+  - eslint --ext .js --fix src\
+  
+# runTest:
+#   stage: test
+#   script:
+#   - echo 'Not implement'
+
+buildDebugApk:
+  image: matico/react-native-android:1.0
+  stage: buildDebug
+  tags:
+  - build
+  script:
+  - export ANDROID_HOME=/android-sdk-linux
+  - export PATH=$PATH:/android-sdk-linux/platform-tools/
+  - npm install
+  - chmod +x android/gradlew
+  - echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+  - cd android && ./gradlew assembleDebug
+  artifacts:
+    paths:
+    - android/app/build/outputs/apk/debug/app-debug.apk
+buildReleaseApk:
+  image: matico/react-native-android:1.0
+  stage: buildRelease
+  tags:
+  - build
+  script:
+  - export ANDROID_HOME=/android-sdk-linux
+  - export PATH=$PATH:/android-sdk-linux/platform-tools/
+  - npm install
+  - chmod +x android/gradlew
+  - echo fs.inotify.max_user_watches=524288 | tee -a /etc/sysctl.conf && sysctl -p
+  - cd android && ./gradlew assembleRelease
+  artifacts:
+    paths:
+    - android/app/build/outputs/apk/release/app-release.apk
+#   when: manual
+deployDownloadLink:
+  variables:
+    GIT_STRATEGY: none
+  tags:
+  - deploy
+  stage: deploy
+  dependencies:
+  - buildDebugApk
+  - buildReleaseApk
+  script:
+  - DATE=`date '+%Y-%m-%d-%H-%M-%S'`
+  - cp android/app/build/outputs/apk/debug/app-debug.apk ${ANDROID_APK_DOWNLOAD_PATH}/${DATE}-debug.apk
+  - cp android/app/build/outputs/apk/release/app-release.apk ${ANDROID_APK_DOWNLOAD_PATH}/${DATE}-release.apk
