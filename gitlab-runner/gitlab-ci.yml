@@ -12,7 +12,7 @@ variables:
   ANDROID_APK_DOWNLOAD_PATH: "/var/www/html/supotore_android_dl"
   ANDROID_DEBUG_APK: "android/app/build/outputs/apk/debug/app-debug.apk"
   ANDROID_RELEASE_APK: "android/app/build/outputs/apk/release/app-release.apk"
-  ANDROID_DOWNLOAD_URL: "http://localhost:8080/"
+  ANDROID_DOWNLOAD_URL: "http://13.115.128.37:8080/"
   
 checkEslint:
   image: matico/react-native-eslint:1.1
@@ -56,7 +56,7 @@ buildReleaseApk:
   artifacts:
     paths:
     - ${ANDROID_RELEASE_APK}
-#   when: manual
+    
 deployDownloadLink:
   variables:
     GIT_STRATEGY: none
@@ -72,21 +72,18 @@ deployDownloadLink:
   - mv ${ANDROID_RELEASE_APK} ${ANDROID_APK_DOWNLOAD_PATH}/${DATE}-release.apk
   
 buildIOS:
+  cache:
+    paths:
+    - node_modules/
   tags:
   - ios
   stage: buildRelease
-  variables:
-    PLATFORM: ios
-    FILE_TYPE: ipa
-    OUTPUT_PATH: ./$CI_PROJECT_NAME
+  before_script:
+  - chmod +x scripts/ios/fastlane.sh
   script:
-  - export PACKAGE_NAME=$(node -p -e "require('./package.json').name")
-  - cd ios
-  - xcodebuild -scheme $PACKAGE_NAME archive -archivePath $PACKAGE_NAME.xcarchive -allowProvisioningUpdates
-  - xcodebuild -exportArchive -archivePath ./$PACKAGE_NAME.xcarchive -exportPath . -exportOptionsPlist $PACKAGE_NAME/Info.plist
-  artifacts:
-    paths:
-    - $PACKAGE_NAME.ipa
+  - scripts/ios/fastlane.sh
+  allow_failure: true
+  when: manual
 
 notifyWhenDone:
   tags:
