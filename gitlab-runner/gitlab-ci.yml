@@ -12,8 +12,8 @@ variables:
   ANDROID_APK_DOWNLOAD_PATH: "/var/www/html/supotore_android_dl"
   ANDROID_DEBUG_APK: "android/app/build/outputs/apk/debug/app-debug.apk"
   ANDROID_RELEASE_APK: "android/app/build/outputs/apk/release/app-release.apk"
-  ANDROID_DOWNLOAD_URL: "http://13.115.128.37:8080/"
-  
+  ANDROID_DOWNLOAD_URL: "http://xxx:8080/"
+
 checkEslint:
   image: matico/react-native-eslint:1.1
   stage: test
@@ -24,6 +24,17 @@ checkEslint:
   - chmod +x ./scripts/check_eslint.sh
   script:
   - ./scripts/check_eslint.sh
+  
+checkSonaqube:
+  image: matico/sonarscanner-react-native:latest
+  stage: test
+  tags:
+  - test
+  allow_failure: true
+  before_script:
+  - chmod +x ./scripts/check_sonarqube.sh
+  script:
+  - ./scripts/check_sonarqube.sh
   
 # runTest:
 #   stage: test
