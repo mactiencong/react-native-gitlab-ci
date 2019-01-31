@@ -1,25 +1,40 @@
 version: '3'
 services:
-  supotore_apk:
+  listApk:
     image: nginx:alpine
-    container_name: supotore_apk
+    container_name: listApk
     restart: unless-stopped
     tty: true
     ports:
       - "8080:80"
     volumes:
-      - /var/www/html/supotore_android_dl/:/var/www
+      - /var/www/html/xxx/:/var/www
       - ./nginx/conf.d/:/etc/nginx/conf.d/
     networks:
-      - supotore
+      - xxx
+
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_USER: sonar
+    networks:
+      - xxx
+
   sonarqube:
     image: sonarqube
-    container_name: sonarqube
-    restart: unless-stopped
-    tty: true
     ports:
-      - "9000:9000"
+      - 9000:9000
+      - 9092:9092
+    depends_on:
+      - db
+    environment:
+      SONARQUBE_JDBC_USERNAME: sonar
+      SONARQUBE_JDBC_PASSWORD: sonar
+      SONARQUBE_JDBC_URL: jdbc:postgresql://db/sonar
     networks:
-      - supotore
+      - xxx
+
 networks:
-  supotore
+  xxx:
