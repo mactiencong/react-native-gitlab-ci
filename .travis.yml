@@ -2,4 +2,4 @@ language: ruby
 services:
   - docker
 script:
-  - docker build -f eslint.Dockerfile
+  - docker build -f eslint.Dockerfile -t matico/react-native-jest .
